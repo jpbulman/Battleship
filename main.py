@@ -134,13 +134,12 @@ class Board:
 
     # Prints two boards side by side
     def print_boards(self, board2):
-
         for x in range(len(self.mainBoard)):
             for y in range(len(self.mainBoard)):
                 print(self.mainBoard[y][x], end='')
-            print(" ",end='')
+            print(" ", end='')
             for z in range(len(board2.mainBoard)):
-                print(board2.mainBoard[z][x],end='')
+                print(board2.mainBoard[z][x], end='')
 
             print()
 
@@ -177,14 +176,13 @@ class Board:
         self.mainBoard[x-1][y-1] = 'x'
 
     # Determines if all the ships have been destroyed
-    # 0 is false, 1 is true
     def are_all_ships_gone(self):
         for x in range(len(self.mainBoard)):
             for y in range(len(self.mainBoard)):
                 if self.mainBoard[x][y] != 'x' or self.mainBoard[x][y] != 'o' or self.mainBoard[x][y] != '-':
-                    return 0
+                    return False
 
-        return 1
+        return True
 
 
 # Player's fleet
@@ -202,67 +200,62 @@ enemyFleet.randomly_populate_board()
 # Enemy tracker
 enemyTracker = Board()
 
-# Take out later
-print("Enemy Board: ")
-enemyFleet.print_board()
-
 # If there are still ships on either board, keep going
-while playersShipBoard.are_all_ships_gone() == 0 and enemyFleet.are_all_ships_gone() == 0:
+while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ships_gone() is False:
 
     print("\nHere is your current fleet and your tracking board: ")
     playersShipBoard.print_boards(playersTrackingBoard)
 
     print("\nWhat is your guess?")
 
-    # Gets the user's x guess
-    entered_x = input("X Coordinate: ")
+    coordinate_guess = input("Coordinate guess: ")
 
-    # Way to tell if the input is a proper integer or not
-    is_x = 0
+    letter_coordinates = {
+        "A": 1,
+        "B": 2,
+        "C": 3,
+        "D": 4,
+        "E": 5,
+        "F": 6,
+        "G": 7,
+        "H": 8,
+        "I": 9,
+        "J": 10
+    }
 
-    while is_x == 0:
-        
+    is_coord = 0
+    x_guess = 1
+
+    while is_coord == 0:
+
         # Secret!
-        while entered_x == '/e':
+        while coordinate_guess == '/E':
             enemyFleet.print_boards(enemyTracker)
-            entered_x = input("X Coordinate: ")
+            coordinate_guess = input("Coordinate guess: ")
 
         try:
-            int(entered_x)
-            is_x = 1
-        except ValueError:
-            print("Not a valid X coordinate, try again")
-            entered_x = input("X Coordinate: ")
+            y_guess = str(coordinate_guess[:1])
+            y_guess = letter_coordinates[y_guess]
+            x_guess = int(str(coordinate_guess[1:]))
 
-    # Makes an int out of the input
-    xCoord = int(entered_x)
+            if x_guess > 10 or x_guess < 1:
+                raise KeyError
 
-    entered_y = input("Y Coordinate: ")
+            is_coord = 1
+        except KeyError:
+            print("Not a valid coordinate, try again")
+            coordinate_guess = input("Coordinate guess: ")
 
-    is_y = 0
-
-    while is_y == 0:
-        try:
-            int(entered_y)
-            is_y = 1
-        except ValueError:
-            print("Not a valid Y coordinate, try again")
-            entered_y = input("Y Coordinate: ")
-
-    yCoord = int(entered_y)
-    print("You guessed: ", xCoord, yCoord)
-
-    # Determines if the guess is a hit or a miss
-    result = enemyFleet.hit_or_miss(xCoord, yCoord)
+    result = enemyFleet.hit_or_miss(x_guess, y_guess)
 
     if result == 'h':
         print("Hit!\n")
-        playersTrackingBoard.add_hit(xCoord, yCoord)
-        enemyFleet.add_hit(xCoord, yCoord)
+        playersTrackingBoard.add_hit(x_guess, y_guess)
+        enemyFleet.add_hit(x_guess, y_guess)
     else:
         print("You missed\n")
-        playersTrackingBoard.add_miss(xCoord, yCoord)
-        enemyFleet.add_miss(xCoord, yCoord)
+        playersTrackingBoard.add_miss(x_guess, y_guess)
+        enemyFleet.add_miss(x_guess, y_guess)
 
     # Makes a guess for the computer
     # At the moment, it is random, but hopefully I can modify it later to play strategically
