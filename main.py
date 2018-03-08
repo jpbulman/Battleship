@@ -1,9 +1,14 @@
 import random
+import sys
 
 
 class Board:
-    # Initializes a 2D array of length and width 10
-    mainBoard = [['-' for x in range(10)] for y in range(10)]
+
+    mainBoard = []
+
+    def __init__(self):
+        # Initializes a 2D array of length and width 10
+        self.mainBoard = [['-' for x in range(10)] for y in range(10)]
 
     # Places a ship of length n randomly onto the board
     def place_random_ship(self, length):
@@ -122,7 +127,6 @@ class Board:
 
     # Prints the board to the console
     def print_board(self):
-
         for x in range(len(self.mainBoard)):
             for y in range(len(self.mainBoard)):
                 print(self.mainBoard[y][x], end='')
@@ -144,7 +148,114 @@ class Board:
         self.place_random_ship(4)
         self.place_random_ship(5)
 
+    # Returns hit or miss for a given coordinate
+    def hit_or_miss(self, x, y):
+        space = self.mainBoard[x-1][y-1]
+        if space != '-' and space != 'o':
+            return 'h'
+        else:
+            return 'm'
 
-theBoard = Board()
-theBoard.randomly_populate_board()
-theBoard.print_board()
+    # Adds a miss to a tracker board
+    def add_miss(self, x, y):
+        self.mainBoard[x-1][y-1] = 'o'
+
+    # Adds a hit to a board
+    def add_hit(self, x, y):
+        self.mainBoard[x-1][y-1] = 'x'
+
+    # Determines if all the ships have been destroyed
+    def are_all_ships_gone(self):
+        for x in range(len(self.mainBoard)):
+            for y in range(len(self.mainBoard)):
+                if self.mainBoard[x][y] != 'x' or self.mainBoard[x][y] != 'o' or self.mainBoard[x][y] != '-':
+                    return 0
+
+        return 1
+
+
+playersShipBoard = Board()
+playersShipBoard.randomly_populate_board()
+
+playersTrackingBoard = Board()
+
+enemyFleet = Board()
+enemyFleet.randomly_populate_board()
+
+enemyTracker = Board()
+
+# Take out later
+print("Enemy Board: ")
+enemyFleet.print_board()
+
+while playersShipBoard.are_all_ships_gone() == 0 and enemyFleet.are_all_ships_gone() == 0:
+
+    print("\nHere is your current fleet: ")
+    playersShipBoard.print_board()
+    print("\n")
+    print("Here is your current tracking grid: ")
+    playersTrackingBoard.print_board()
+
+    print("\nWhat is your guess?")
+
+    entered_x = input("X Coordinate: ")
+
+    while entered_x == '/r':
+        enemyFleet.print_board()
+        entered_x = input("X Coordinate: ")
+
+    is_x = 0
+
+    while is_x == 0:
+        try:
+            int(entered_x)
+            is_x = 1
+        except ValueError:
+            print("Not a valid X coordinate, try again")
+            entered_x = input("X Coordinate: ")
+
+    xCoord = int(entered_x)
+
+    entered_y = input("Y Coordinate: ")
+
+    # while type(entered_y) is not int:
+    #     print("Not a valid Y coordinate, try again")
+    #     input("Y Coordinate: ")
+
+    yCoord = int(entered_y)
+    print("You guessed: ", xCoord, yCoord)
+
+    result = enemyFleet.hit_or_miss(xCoord, yCoord)
+
+    if result == 'h':
+        print("Hit!\n")
+        playersTrackingBoard.add_hit(xCoord, yCoord)
+        enemyFleet.add_hit(xCoord, yCoord)
+    else:
+        print("You missed\n")
+        playersTrackingBoard.add_miss(xCoord, yCoord)
+        enemyFleet.add_miss(xCoord, yCoord)
+
+    rand_x = random.randint(1, 10)
+    rand_y = random.randint(1, 10)
+
+    enemy_plays = playersShipBoard.hit_or_miss(rand_x, rand_y)
+
+    print("The enemy has guessed ", rand_x, ",", rand_y)
+
+    if enemy_plays == 'h':
+        print("They hit!")
+        playersShipBoard.add_hit(rand_x, rand_y)
+        enemyTracker.add_hit(rand_x, rand_y)
+    else:
+        print("They missed")
+        enemyTracker.add_miss(rand_x, rand_y)
+        playersShipBoard.add_miss(rand_x, rand_y)
+
+playersShipBoard.print_board()
+print()
+playersTrackingBoard.print_board()
+print()
+enemyFleet.print_board()
+print()
+enemyTracker.print_board()
