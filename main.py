@@ -132,6 +132,18 @@ class Board:
                 print(self.mainBoard[y][x], end='')
             print()
 
+    # Prints two boards side by side
+    def print_boards(self, board2):
+
+        for x in range(len(self.mainBoard)):
+            for y in range(len(self.mainBoard)):
+                print(self.mainBoard[y][x], end='')
+            print(" ",end='')
+            for z in range(len(board2.mainBoard)):
+                print(board2.mainBoard[z][x],end='')
+
+            print()
+
     # Populates a board
     def randomly_populate_board(self):
 
@@ -165,6 +177,7 @@ class Board:
         self.mainBoard[x-1][y-1] = 'x'
 
     # Determines if all the ships have been destroyed
+    # 0 is false, 1 is true
     def are_all_ships_gone(self):
         for x in range(len(self.mainBoard)):
             for y in range(len(self.mainBoard)):
@@ -174,39 +187,46 @@ class Board:
         return 1
 
 
+# Player's fleet
 playersShipBoard = Board()
+# Populates the board
 playersShipBoard.randomly_populate_board()
 
+# Makes a board to keep track of guesses
 playersTrackingBoard = Board()
 
+# Enemy's ships
 enemyFleet = Board()
 enemyFleet.randomly_populate_board()
 
+# Enemy tracker
 enemyTracker = Board()
 
 # Take out later
 print("Enemy Board: ")
 enemyFleet.print_board()
 
+# If there are still ships on either board, keep going
 while playersShipBoard.are_all_ships_gone() == 0 and enemyFleet.are_all_ships_gone() == 0:
 
-    print("\nHere is your current fleet: ")
-    playersShipBoard.print_board()
-    print("\n")
-    print("Here is your current tracking grid: ")
-    playersTrackingBoard.print_board()
+    print("\nHere is your current fleet and your tracking board: ")
+    playersShipBoard.print_boards(playersTrackingBoard)
 
     print("\nWhat is your guess?")
 
+    # Gets the user's x guess
     entered_x = input("X Coordinate: ")
 
-    while entered_x == '/r':
-        enemyFleet.print_board()
-        entered_x = input("X Coordinate: ")
-
+    # Way to tell if the input is a proper integer or not
     is_x = 0
 
     while is_x == 0:
+        
+        # Secret!
+        while entered_x == '/e':
+            enemyFleet.print_boards(enemyTracker)
+            entered_x = input("X Coordinate: ")
+
         try:
             int(entered_x)
             is_x = 1
@@ -214,17 +234,25 @@ while playersShipBoard.are_all_ships_gone() == 0 and enemyFleet.are_all_ships_go
             print("Not a valid X coordinate, try again")
             entered_x = input("X Coordinate: ")
 
+    # Makes an int out of the input
     xCoord = int(entered_x)
 
     entered_y = input("Y Coordinate: ")
 
-    # while type(entered_y) is not int:
-    #     print("Not a valid Y coordinate, try again")
-    #     input("Y Coordinate: ")
+    is_y = 0
+
+    while is_y == 0:
+        try:
+            int(entered_y)
+            is_y = 1
+        except ValueError:
+            print("Not a valid Y coordinate, try again")
+            entered_y = input("Y Coordinate: ")
 
     yCoord = int(entered_y)
     print("You guessed: ", xCoord, yCoord)
 
+    # Determines if the guess is a hit or a miss
     result = enemyFleet.hit_or_miss(xCoord, yCoord)
 
     if result == 'h':
@@ -236,6 +264,8 @@ while playersShipBoard.are_all_ships_gone() == 0 and enemyFleet.are_all_ships_go
         playersTrackingBoard.add_miss(xCoord, yCoord)
         enemyFleet.add_miss(xCoord, yCoord)
 
+    # Makes a guess for the computer
+    # At the moment, it is random, but hopefully I can modify it later to play strategically
     rand_x = random.randint(1, 10)
     rand_y = random.randint(1, 10)
 
