@@ -179,10 +179,39 @@ class Board:
     def are_all_ships_gone(self):
         for x in range(len(self.mainBoard)):
             for y in range(len(self.mainBoard)):
-                if self.mainBoard[x][y] != 'x' or self.mainBoard[x][y] != 'o' or self.mainBoard[x][y] != '-':
+                if self.mainBoard[x][y] != 'x' and self.mainBoard[x][y] != 'o' and self.mainBoard[x][y] != '-':
                     return False
 
         return True
+
+    # Destroys all ships in a board
+    def destroy_ships(self):
+        for x in range(len(self.mainBoard)):
+            for y in range(len(self.mainBoard)):
+                if self.mainBoard[x][y] != 'x' and self.mainBoard[x][y] != 'o' and self.mainBoard[x][y] != '-':
+                    self.mainBoard[x][y] = 'x'
+
+    # Determines if n ship has sunk
+    def n_has_sunk(self, n):
+        for x in range(len(self.mainBoard)):
+            for y in range(len(self.mainBoard)):
+                if self.mainBoard[x][y] == n:
+                    return False
+        return True
+
+    # If the 2 ship has sunk
+    def two_has_sunk(self):
+        return self.n_has_sunk('2')
+
+    # If the 4 ship has sunk
+    def four_has_sunk(self):
+        return self.n_has_sunk('4')
+
+    # If the 5 ship has sunk
+    def five_has_sunk(self):
+        return self.n_has_sunk('5')
+
+    # If one of the three ships has been sunk
 
 
 # Player's fleet
@@ -223,8 +252,8 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
         "J": 10
     }
 
+    # Variable determining if the given input is a valid coordinate or not, 0 is false
     is_coord = 0
-    x_guess = 1
 
     while is_coord == 0:
 
@@ -233,6 +262,12 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
             enemyFleet.print_boards(enemyTracker)
             coordinate_guess = input("Coordinate guess: ")
 
+        # Secret!
+        while coordinate_guess == '/D':
+            enemyFleet.destroy_ships()
+            coordinate_guess = input("Coordinate guess: ")
+
+        # Try making coordinates out of the input
         try:
             y_guess = str(coordinate_guess[:1])
             y_guess = letter_coordinates[y_guess]
@@ -242,7 +277,7 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
                 raise KeyError
 
             is_coord = 1
-        except KeyError:
+        except KeyError or ValueError:
             print("Not a valid coordinate, try again")
             coordinate_guess = input("Coordinate guess: ")
 
@@ -256,6 +291,12 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
         print("You missed\n")
         playersTrackingBoard.add_miss(x_guess, y_guess)
         enemyFleet.add_miss(x_guess, y_guess)
+
+    if enemyFleet.are_all_ships_gone():
+        break
+
+    if enemyFleet.two_has_sunk():
+        print("Enemy: You sunk my battle ship!")
 
     # Makes a guess for the computer
     # At the moment, it is random, but hopefully I can modify it later to play strategically
@@ -275,10 +316,8 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
         enemyTracker.add_miss(rand_x, rand_y)
         playersShipBoard.add_miss(rand_x, rand_y)
 
-playersShipBoard.print_board()
-print()
-playersTrackingBoard.print_board()
-print()
-enemyFleet.print_board()
-print()
-enemyTracker.print_board()
+if playersShipBoard.are_all_ships_gone() is True:
+    print("All of your ships have been compromised, you lose")
+
+if enemyFleet.are_all_ships_gone() is True:
+    print("The enemy fleet has been defeated! Well done commander, you win!")
