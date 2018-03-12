@@ -1,5 +1,9 @@
 import random
-import sys
+
+# Need to add:
+# Sinking ship messages when one of the user's ships gets destroyed
+# Better computer player
+# Statistics
 
 
 class Board:
@@ -246,10 +250,10 @@ enemyTracker = Board()
 # If there are still ships on either board, keep going
 while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ships_gone() is False:
 
-    print("\nHere is your current fleet and your tracking board: ")
+    print("Here is your current fleet and your tracking board: ")
     playersShipBoard.print_boards(playersTrackingBoard)
 
-    print("\nWhat is your guess?")
+    print("What is your guess?")
 
     coordinate_guess = input("Coordinate guess: ")
 
@@ -269,6 +273,7 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
     # Variable determining if the given input is a valid coordinate or not, 0 is false
     is_coord = 0
 
+    # While the input from the user is a valid coordinate
     while is_coord == 0:
 
         # Secret!
@@ -290,48 +295,58 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
             if x_guess > 10 or x_guess < 1:
                 raise KeyError
 
+            # If there are no errors, then it is a coordinate
             is_coord = 1
+
+        # If the user enters invalid coordinates, have them try again
         except KeyError or ValueError:
             print("Not a valid coordinate, try again")
             coordinate_guess = input("Coordinate guess: ")
 
+    # Gets the result of the user's guess
     result = enemyFleet.hit_or_miss(x_guess, y_guess)
 
+    # If the user hits
     if result == 'h':
         print("Hit!\n")
         playersTrackingBoard.add_hit(x_guess, y_guess)
         enemyFleet.add_hit(x_guess, y_guess)
+    # If the user misses
     else:
         print("You missed\n")
         playersTrackingBoard.add_miss(x_guess, y_guess)
         enemyFleet.add_miss(x_guess, y_guess)
 
+    # If the enemy ships have been defeated, skip to the end
     if enemyFleet.are_all_ships_gone():
         break
 
+    # If any of the ships have been sunk from the last turn
     if enemyFleet.two_has_sunk() or enemyFleet.three_has_sunk() or enemyFleet.four_has_sunk() or enemyFleet.five_has_sunk():
-        print("Enemy: You sunk my battle ship!")
+        print("Great job commander, you sunk one of their battleships!\n")
 
     # Makes a guess for the computer
     # At the moment, it is random, but hopefully I can modify it later to play strategically
-    rand_x = random.randint(1, 10)
-    rand_y = random.randint(1, 10)
+    rand_x_guess = random.randint(1, 10)
+    rand_y_guess = random.randint(1, 10)
 
-    enemy_plays = playersShipBoard.hit_or_miss(rand_x, rand_y)
+    enemy_plays = playersShipBoard.hit_or_miss(rand_x_guess, rand_y_guess)
 
-    print("The enemy has guessed ", rand_x, ",", rand_y)
+    print("The enemy has guessed ", rand_x_guess, ",", rand_y_guess)
 
     if enemy_plays == 'h':
-        print("They hit!")
-        playersShipBoard.add_hit(rand_x, rand_y)
-        enemyTracker.add_hit(rand_x, rand_y)
+        print("The enemy has hit!\n")
+        playersShipBoard.add_hit(rand_x_guess, rand_y_guess)
+        enemyTracker.add_hit(rand_x_guess, rand_y_guess)
     else:
-        print("They missed")
-        enemyTracker.add_miss(rand_x, rand_y)
-        playersShipBoard.add_miss(rand_x, rand_y)
+        print("The enemy missed\n")
+        enemyTracker.add_miss(rand_x_guess, rand_y_guess)
+        playersShipBoard.add_miss(rand_x_guess, rand_y_guess)
 
+# If the player has lost
 if playersShipBoard.are_all_ships_gone() is True:
     print("All of your ships have been compromised, you lose")
 
+# If the player has won the game
 if enemyFleet.are_all_ships_gone() is True:
     print("The enemy fleet has been defeated! Well done commander, you win!")
