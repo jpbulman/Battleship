@@ -203,6 +203,20 @@ class Board:
     def two_has_sunk(self):
         return self.n_has_sunk('2')
 
+    # If either of the 3 ships has sunk
+    def three_has_sunk(self):
+        num_of_threes = 0
+
+        for x in range(len(self.mainBoard)):
+            for y in range(len(self.mainBoard)):
+                if self.mainBoard[x][y] == '3':
+                    num_of_threes += 1
+
+        if num_of_threes == 3 or num_of_threes == 6:
+            return True
+        else:
+            return False
+
     # If the 4 ship has sunk
     def four_has_sunk(self):
         return self.n_has_sunk('4')
@@ -295,7 +309,7 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
     if enemyFleet.are_all_ships_gone():
         break
 
-    if enemyFleet.two_has_sunk():
+    if enemyFleet.two_has_sunk() or enemyFleet.three_has_sunk() or enemyFleet.four_has_sunk() or enemyFleet.five_has_sunk():
         print("Enemy: You sunk my battle ship!")
 
     # Makes a guess for the computer
