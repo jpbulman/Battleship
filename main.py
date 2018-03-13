@@ -1,7 +1,6 @@
 import random
 
 # Need to add:
-# Sinking ship messages when one of the user's ships gets destroyed
 # Better computer player
 # Statistics
 
@@ -216,7 +215,7 @@ class Board:
                 if self.mainBoard[x][y] == '3':
                     num_of_threes += 1
 
-        if num_of_threes == 3 or num_of_threes == 6:
+        if num_of_threes == 3 or num_of_threes == 0:
             return True
         else:
             return False
@@ -290,6 +289,7 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
         try:
             y_guess = str(coordinate_guess[:1])
             y_guess = letter_coordinates[y_guess]
+
             x_guess = int(str(coordinate_guess[1:]))
 
             if x_guess > 10 or x_guess < 1:
@@ -297,9 +297,8 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
 
             # If there are no errors, then it is a coordinate
             is_coord = 1
-
         # If the user enters invalid coordinates, have them try again
-        except KeyError or ValueError:
+        except (KeyError, ValueError):
             print("Not a valid coordinate, try again")
             coordinate_guess = input("Coordinate guess: ")
 
@@ -322,7 +321,7 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
         break
 
     # If any of the ships have been sunk from the last turn
-    if enemyFleet.two_has_sunk() or enemyFleet.three_has_sunk() or enemyFleet.four_has_sunk() or enemyFleet.five_has_sunk():
+    if enemyFleet.two_has_sunk()or enemyFleet.three_has_sunk()or enemyFleet.four_has_sunk()or enemyFleet.five_has_sunk():
         print("Great job commander, you sunk one of their battleships!\n")
 
     # Makes a guess for the computer
@@ -342,6 +341,9 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
         print("The enemy missed\n")
         enemyTracker.add_miss(rand_x_guess, rand_y_guess)
         playersShipBoard.add_miss(rand_x_guess, rand_y_guess)
+
+    if playersShipBoard.two_has_sunk()or playersShipBoard.three_has_sunk()or playersShipBoard.four_has_sunk()or playersShipBoard.five_has_sunk():
+        print("The enemy has sunk one of your ships!")
 
 # If the player has lost
 if playersShipBoard.are_all_ships_gone() is True:
