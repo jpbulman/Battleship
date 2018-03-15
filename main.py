@@ -3,6 +3,7 @@ import random
 # Need to add:
 # Better computer player
 # Statistics
+# Make enemy guess prints normal battleship coords
 
 
 class Board:
@@ -246,6 +247,18 @@ enemyFleet.randomly_populate_board()
 # Enemy tracker
 enemyTracker = Board()
 
+# Variables for the computer to use to guess
+
+direction_to_go = 0
+
+number__of__ships__sunk = 0
+
+# Number of guesses the computer has made
+guess_num = 0
+
+# Array of pairs of numbers representing the previously guessed coordinates
+prev_guesses = [None]*100
+
 # If there are still ships on either board, keep going
 while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ships_gone() is False:
 
@@ -329,7 +342,15 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
     rand_x_guess = random.randint(1, 10)
     rand_y_guess = random.randint(1, 10)
 
+    # Do not guess a spot that has already been guessed
+    while prev_guesses.__contains__([rand_x_guess,rand_y_guess]):
+        rand_x_guess = random.randint(1, 10)
+        rand_y_guess = random.randint(1, 10)
+
     enemy_plays = playersShipBoard.hit_or_miss(rand_x_guess, rand_y_guess)
+
+    # Previous guesses of the computer with the current guess number is the current x and y
+    prev_guesses[guess_num] = [rand_x_guess, rand_y_guess]
 
     print("The enemy has guessed ", rand_x_guess, ",", rand_y_guess)
 
@@ -344,6 +365,11 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
 
     if playersShipBoard.two_has_sunk()or playersShipBoard.three_has_sunk()or playersShipBoard.four_has_sunk()or playersShipBoard.five_has_sunk():
         print("The enemy has sunk one of your ships!")
+
+    # Add one to the number of computer guesses
+    guess_num += 1
+
+    print(prev_guesses)
 
 # If the player has lost
 if playersShipBoard.are_all_ships_gone() is True:
