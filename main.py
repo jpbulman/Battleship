@@ -203,6 +203,22 @@ class Board:
                     return False
         return True
 
+    # Returns the number of ships with length 3 that are alive
+    def num_threes_alive(self):
+        num_of_threes = 0
+
+        for x in range(len(self.mainBoard)):
+            for y in range(len(self.mainBoard)):
+                if self.mainBoard[x][y] == '3':
+                    num_of_threes += 1
+
+        if num_of_threes == 3:
+            return 1
+        if num_of_threes == 6:
+            return 2
+        else:
+            return 0
+
     # If the 2 ship has sunk
     def two_has_sunk(self):
         return self.n_has_sunk('2')
@@ -251,13 +267,22 @@ enemyTracker = Board()
 
 direction_to_go = 0
 
-number__of__ships__sunk = 0
+num_ships_destroyed = 0
+
+temp_ships_destroyed = 0
+
+# Put bool in spot if the ship has been sunk
+# Index 0- 2 ship, 1-First 3 ships, 2-Second three ship, 3-4 ship, 4-5 ship
+ships_sunk = [None]*5
 
 # Number of guesses the computer has made
 guess_num = 0
 
 # Array of pairs of numbers representing the previously guessed coordinates
 prev_guesses = [None]*100
+
+# Array of previous guess results
+prev_guess_results = [None]*100
 
 # If there are still ships on either board, keep going
 while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ships_gone() is False:
@@ -349,6 +374,8 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
 
     enemy_plays = playersShipBoard.hit_or_miss(rand_x_guess, rand_y_guess)
 
+    prev_guess_results[guess_num] = enemy_plays
+
     # Previous guesses of the computer with the current guess number is the current x and y
     prev_guesses[guess_num] = [rand_x_guess, rand_y_guess]
 
@@ -368,6 +395,26 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
 
     # Add one to the number of computer guesses
     guess_num += 1
+
+    if playersShipBoard.two_has_sunk() and ships_sunk[0] is False:
+        ships_sunk[0] = True
+        num_ships_destroyed += 1
+
+    if playersShipBoard.num_threes_alive() == 1 and ships_sunk[1] is False:
+        ships_sunk[1] = True
+        num_ships_destroyed += 1
+
+    if playersShipBoard.num_threes_alive() == 0 and ships_sunk[2] is False:
+        ships_sunk[2] = True
+        num_ships_destroyed += 1
+
+    if playersShipBoard.four_has_sunk() and ships_sunk[3] is False:
+        ships_sunk[3] = True
+        num_ships_destroyed += 1
+
+    if playersShipBoard.five_has_sunk() and ships_sunk[4] is False:
+        ships_sunk[4] = True
+        num_ships_destroyed += 1
 
     print(prev_guesses)
 
