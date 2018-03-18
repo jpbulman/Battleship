@@ -1,10 +1,10 @@
 import random
 
 # Need to add:
-# Better computer player
-# Statistics
-# Make enemy guess prints normal battleship coords
-
+#  Better computer player
+#  Statistics
+#  Make enemy guess prints normal battleship coords
+#  More documentation
 
 class Board:
 
@@ -265,10 +265,13 @@ enemyTracker = Board()
 
 # Variables for the computer to use to guess
 
+# Direction to try and guess in
 direction_to_go = 0
 
+# The number of ships destroyed by the enemy
 num_ships_destroyed = 0
 
+# Temporary number of ships destroyed (used and explained more below)
 temp_ships_destroyed = 0
 
 # Put bool in spot if the ship has been sunk
@@ -415,8 +418,6 @@ while playersShipBoard.are_all_ships_gone() is False and enemyFleet.are_all_ship
     if playersShipBoard.five_has_sunk() and ships_sunk[4] is False:
         ships_sunk[4] = True
         num_ships_destroyed += 1
-
-    print(prev_guesses)
 
 # If the player has lost
 if playersShipBoard.are_all_ships_gone() is True:
